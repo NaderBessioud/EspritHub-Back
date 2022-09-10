@@ -16,9 +16,18 @@ public class UserQuestion {
 	private TypeBadge badge;
 	private boolean closed;
 	private String image;
+	private String rscr;
 	
 	
 	
+	
+	
+	public String getRscr() {
+		return rscr;
+	}
+	public void setRscr(String rscr) {
+		this.rscr = rscr;
+	}
 	public String getImage() {
 		return image;
 	}
@@ -108,7 +117,7 @@ public class UserQuestion {
 		this.role = role;
 	}
 	public UserQuestion(Long idd,String nom, String content, Date datepub, String title, int nbranswers, List<String> tags,
-			String role,TypeBadge badge, boolean closed,String image) {
+			String role,TypeBadge badge, boolean closed,String image,String src) {
 		super();
 		this.id=idd;
 		this.nom = nom;
@@ -121,6 +130,7 @@ public class UserQuestion {
 		this.badge=badge;
 		this.closed=closed;
 		this.image=image;
+		this.rscr=src;
 	}
 	public UserQuestion(Long idd,String nom, String content, Date datepub, String title, int nbranswers, String role,TypeBadge badge,String image) {
 		super();
@@ -141,7 +151,7 @@ public class UserQuestion {
 		this.nbreNotapproved = nbreNotapproved;
 	}
 	public UserQuestion(Long idd ,String nom, String content, Date datepub, String title, int nbranswers, List<String> tags,
-			String role, int nbreNotapproved,TypeBadge badge,String image) {
+			String role, int nbreNotapproved,TypeBadge badge,String image,String src) {
 		super();
 		this.id=idd;
 		this.nom = nom;
@@ -155,6 +165,7 @@ public class UserQuestion {
 		this.badge=badge;
 		
 		this.image=image;
+		this.rscr=src;
 	}
 	public Long getId() {
 		return id;

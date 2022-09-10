@@ -7,12 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-
+import javax.persistence.Convert;
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.FileUtils;
@@ -27,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import ch.qos.logback.core.pattern.Converter;
 import tn.esprithub.Entities.Question;
 import tn.esprithub.Entities.Reaction;
 import tn.esprithub.Entities.Response;
@@ -63,19 +68,46 @@ public class QuestionServiceImp implements QuestionService {
 	
 	@Autowired
 	private RessourceRepository repository2;
+	
+	@Transactional
+	public Question addQuestionWithoutRessource(Question q,long idu) {
+		User user=userRepository.findById(idu).get();
+		
+		
+
+		
+		
+	q.setClosed(false);
+	q.setDatepub(new Date());
+	q.setUserquestions(user);
+	
+	Question question= questionRepository.save(q);
+	user.getQuestions().add(q);
+	userRepository.save(user);
+	
+	return question;
+
+	}
 
 	@Transactional
-	public Question addQuestion(Question q,Long idr) {
-		
-		
+	public Question addQuestion(Question q,Long idr,long idu) {
+			
+			User user=userRepository.findById(idu).get();
 			Ressource ressource=repository2.findById(idr).get();
-			ressource.setRessources(q);
-			repository2.save(ressource);
+			
 
-		
+			
+			
 		q.setClosed(false);
 		q.setDatepub(new Date());
-		return questionRepository.save(q);
+		q.setUserquestions(user);
+		
+		Question question= questionRepository.save(q);
+		user.getQuestions().add(q);
+		userRepository.save(user);
+		ressource.setRessources(q);
+		repository2.save(ressource);
+		return question;
 	}
 
 	@Override
@@ -98,7 +130,7 @@ public class QuestionServiceImp implements QuestionService {
 		return questionRepository.findById(id).orElse(null);
 	}
 	
-	public List<UserQuestion> getAllUserQuestions() throws IOException{
+	public List<UserQuestion> getAllUserQuestions() throws IOException, SerialException, SQLException{
 		List<Question> questions =this.retrieveQuestions();
 		List<UserQuestion> result=new ArrayList<>();
 	
@@ -110,17 +142,32 @@ public class QuestionServiceImp implements QuestionService {
 			for (Tag tag : q.getTags()) {
 				tags.add(tag.getTitle());	
 			}
+			
+			Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
+			if(ressource != null) {
+			if(ressource.getType() ==TypeRessource.Image){
+				System.out.print(ressource.getLibelle());
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
 		
+			}
+			else
+			
+			result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
+			
+			}
+			else {
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),""));
+
+			}
 			
 			
 			
-			result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage())));
 		}
 		
 		return result;
 	}
 	
-	public UserQuestion getQuestion(Long id) throws IOException {
+	public UserQuestion getQuestion(Long id) throws IOException, SerialException, SQLException {
 		Question question=questionRepository.findById(id).get();
 		String nom=question.getUserquestions().getFirstName()+" "+question.getUserquestions().getLastName();
 		List<String> tags=new ArrayList<>();
@@ -128,10 +175,22 @@ public class QuestionServiceImp implements QuestionService {
 			tags.add(tag.getTitle());
 			
 		}
+		Ressource ressource=question.getQuestionressources().stream().findFirst().orElse(null);
+		if(ressource != null) {
+		if(ressource.getType() ==TypeRessource.Image){
+			return new UserQuestion(question.getIdQuestion(), nom, question.getContent(), question.getDatepub(), question.getTitle(), 0, tags, question.getUserquestions().getRole().toString(),responseServiceImp.AffectBadge(question.getUserquestions().getId()),question.isClosed(),this.downloadImage(question.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle()));
+	
+		}
+		else
 		
-		return new UserQuestion(question.getIdQuestion(), nom, question.getContent(), question.getDatepub(), question.getTitle(), 0, tags, question.getUserquestions().getRole().toString(),responseServiceImp.AffectBadge(question.getUserquestions().getId()),question.isClosed(),this.downloadImage(question.getUserquestions().getImage()));
+		return new UserQuestion(question.getIdQuestion(), nom, question.getContent(), question.getDatepub(), question.getTitle(), 0, tags, question.getUserquestions().getRole().toString(),responseServiceImp.AffectBadge(question.getUserquestions().getId()),question.isClosed(),this.downloadImage(question.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle()));
 		
-	}
+		}
+		else {
+			return new UserQuestion(question.getIdQuestion(), nom, question.getContent(), question.getDatepub(), question.getTitle(), 0, tags, question.getUserquestions().getRole().toString(),responseServiceImp.AffectBadge(question.getUserquestions().getId()),question.isClosed(),this.downloadImage(question.getUserquestions().getImage()),"");
+
+		}
+		}
 	
 	@Transactional
 	public void addQuestionAndAffectTag(Question question,Long id) {
@@ -255,8 +314,10 @@ public class QuestionServiceImp implements QuestionService {
 
 		}
 	 
-	 public ResponseEntity downloadFile(String name) {
+	 public String downloadFile(String name) throws SerialException, SQLException {
 		 FTPClient ftpClient = new FTPClient();
+		 Blob result=null;
+		 String src="";
 	        try {
 	        		
 	        	   ftpClient.connect("192.168.1.19", 21);
@@ -285,6 +346,8 @@ public class QuestionServiceImp implements QuestionService {
 	            InputStream inputStream = ftpClient.retrieveFileStream(remoteFile2);
 	            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	            byte[] bytesArray = IOUtils.toByteArray(inputStream);
+	            src="data:application/pdf;base64,"+Base64.getEncoder().encodeToString(bytesArray);
+	            
 	            FileUtils.writeByteArrayToFile(file,bytesArray );
 	            /*int bytesRead = -1;
 	            int nRead;
@@ -300,12 +363,9 @@ public class QuestionServiceImp implements QuestionService {
 	           // outputStream2.close();
 	            inputStream.close();
 	            System.out.print(FilenameUtils.getExtension(name));
-	            return ResponseEntity.ok()
-	                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
-	                    .body(file);
-	        
-	 
-	 
+	            
+	            result=new SerialBlob(bytesArray);
+	            
 	        } catch (IOException ex) {
 	            System.out.println("Error: " + ex.getMessage());
 	            ex.printStackTrace();
@@ -319,7 +379,8 @@ public class QuestionServiceImp implements QuestionService {
 	                ex.printStackTrace();
 	            }
 	        }
-	        return null;
+	        //System.out.println(src);
+	        return src;
 	 }
 	 
 	 public long addRessource(Ressource ressource) {
@@ -328,7 +389,7 @@ public class QuestionServiceImp implements QuestionService {
 		 
 	 }
 	 
-	 public List<UserQuestion> getTeachersQuestion() throws IOException{
+	 public List<UserQuestion> getTeachersQuestion() throws IOException, SerialException, SQLException{
 		 List<Question> list=new ArrayList<>(); 
 		 List<Question> questions =this.retrieveQuestions();
 			List<UserQuestion> result=new ArrayList<>();
@@ -346,9 +407,62 @@ public class QuestionServiceImp implements QuestionService {
 				}
 			
 				
+				Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
+				if(ressource != null) {
+				if(ressource.getType() ==TypeRessource.Image){
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
+			
+				}
+				else
 				
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
 				
-				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage())));
+				}
+				else {
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),""));
+
+				}
+				
+			}
+			
+			return result;
+		 
+	 }
+	 
+	 public List<UserQuestion> getStudentsQuestion() throws IOException, SerialException, SQLException{
+		 List<Question> list=new ArrayList<>(); 
+		 List<Question> questions =this.retrieveQuestions();
+			List<UserQuestion> result=new ArrayList<>();
+		for (Question question :questions) {
+			if(question.getUserquestions().getRole()==Role.user)
+				list.add(question);
+		}
+			
+			for (Question q : list) {
+				User user=userRepository.findById(q.getUserquestions().getId()).get();
+				String nom=user.getFirstName()+" "+user.getLastName();
+				List<String> tags=new ArrayList<>();
+				for (Tag tag : q.getTags()) {
+					tags.add(tag.getTitle());	
+				}
+			
+				
+				Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
+				if(ressource != null) {
+				if(ressource.getType() ==TypeRessource.Image){
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
+			
+				}
+				else
+				
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
+				
+				}
+				else {
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(),tags,q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()),this.downloadImage(q.getUserquestions().getImage()),""));
+
+				}
+				
 			}
 			
 			return result;

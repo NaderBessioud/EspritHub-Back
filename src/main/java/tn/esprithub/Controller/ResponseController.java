@@ -30,9 +30,9 @@ public class ResponseController {
 	
 	@PostMapping("/addAnswer")
 	@ResponseBody
-	public Response addResponse(@RequestBody Response response) {
+	public Response addResponse(@RequestBody Response response,@RequestParam("idq") long idq) {
 		
-		return responseServiceImp.addResponse(response);
+		return responseServiceImp.addResponseWithQuestion(response,idq);
 	}
 	
 	

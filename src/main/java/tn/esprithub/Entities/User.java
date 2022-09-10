@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 public class User {
@@ -63,6 +65,7 @@ public class User {
     @OneToMany(mappedBy = "userpoest")
     private Set<Post> posts;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "userquestions")
     private Set<Question> questions;
     

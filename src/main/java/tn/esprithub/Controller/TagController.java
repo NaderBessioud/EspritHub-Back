@@ -1,7 +1,10 @@
 package tn.esprithub.Controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
+
+import javax.sql.rowset.serial.SerialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -60,19 +63,19 @@ public class TagController {
 	
 	@GetMapping("/QuestionByTag")
 	@ResponseBody
-	public List<UserQuestion> getQuestionByTag(@RequestParam("tag") String title) throws IOException{
+	public List<UserQuestion> getQuestionByTag(@RequestParam("tag") String title) throws IOException, SerialException, SQLException{
 		return tagservice.getQuestionByTag(title);
 	}
 	
 	@GetMapping("/TeacherQuestionByTag")
 	@ResponseBody
-	public List<UserQuestion> getTeachersQuestionByTag(@RequestParam("tag") String title) throws IOException{
+	public List<UserQuestion> getTeachersQuestionByTag(@RequestParam("tag") String title) throws IOException, SerialException, SQLException{
 		return tagservice.getTeachersQuestionsByTag(title);
 	}
 	
 	@GetMapping("/SimilarQuestionByTags")
 	@ResponseBody
-	public List<UserQuestion> getSimilarQuestionByTags(@RequestParam("tags") String tags) throws IOException{
+	public List<UserQuestion> getSimilarQuestionByTags(@RequestParam("tags") String tags) throws IOException, SerialException, SQLException{
 		return tagservice.getSimilarQuestionByTags(tags);
 	}
 }

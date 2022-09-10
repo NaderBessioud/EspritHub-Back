@@ -268,6 +268,13 @@ public class ResponseServiceImp implements IResponseService {
        }
 	 }
 	 
+	 public Response addResponseWithQuestion(Response r,long idq) {
+			r.setDatepub(new Date());
+			r.setApproved(0);
+			r.setResponses(questionRepository.findById(idq).get());
+		return	responseRepository.save(r);
+		}
+	 
 	
 
 }

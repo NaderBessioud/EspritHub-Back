@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import org.hibernate.validator.constraints.Length;
+
 @Entity
 
 public class Question {
@@ -17,6 +19,7 @@ public class Question {
     @Column(name = "title")
     private String title;
     @Column(name = "content")
+    @Length(min = 3, max = 1000)
     private String content;
     @Column(name = "likes")
     private int likes;
