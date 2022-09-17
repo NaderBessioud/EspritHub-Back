@@ -40,12 +40,14 @@ import tn.esprithub.Entities.Role;
 import tn.esprithub.Entities.Tag;
 import tn.esprithub.Entities.TypeReaction;
 import tn.esprithub.Entities.TypeRessource;
+import tn.esprithub.Entities.UE;
 import tn.esprithub.Entities.User;
 import tn.esprithub.Entities.UserQuestion;
 import tn.esprithub.Repository.QuestionRepository;
 import tn.esprithub.Repository.ReactionRepository;
 import tn.esprithub.Repository.RessourceRepository;
 import tn.esprithub.Repository.TagRepository;
+import tn.esprithub.Repository.UeRepository;
 import tn.esprithub.Repository.UserRepository;
 
 
@@ -69,10 +71,13 @@ public class QuestionServiceImp implements QuestionService {
 	@Autowired
 	private RessourceRepository repository2;
 	
+	@Autowired
+	private UeRepository ueRepository;
+	
 	@Transactional
-	public Question addQuestionWithoutRessource(Question q,long idu) {
+	public Question addQuestionWithoutRessource(Question q,long idu,long idm) {
 		User user=userRepository.findById(idu).get();
-		
+		UE ue=ueRepository.findById(idm).get();
 		
 
 		
@@ -80,33 +85,38 @@ public class QuestionServiceImp implements QuestionService {
 	q.setClosed(false);
 	q.setDatepub(new Date());
 	q.setUserquestions(user);
+	q.setUe(ue);
 	
 	Question question= questionRepository.save(q);
 	user.getQuestions().add(q);
 	userRepository.save(user);
-	
+	ue.getUequestions().add(question);
+	ueRepository.save(ue);
 	return question;
 
 	}
 
 	@Transactional
-	public Question addQuestion(Question q,Long idr,long idu) {
+	public Question addQuestion(Question q,Long idr,long idu,long idm) {
 			
 			User user=userRepository.findById(idu).get();
 			Ressource ressource=repository2.findById(idr).get();
-			
+			UE ue=ueRepository.findById(idm).get();
 
 			
 			
 		q.setClosed(false);
 		q.setDatepub(new Date());
 		q.setUserquestions(user);
+		q.setUe(ue);
 		
 		Question question= questionRepository.save(q);
 		user.getQuestions().add(q);
 		userRepository.save(user);
 		ressource.setRessources(q);
 		repository2.save(ressource);
+		ue.getUequestions().add(question);
+		ueRepository.save(ue);
 		return question;
 	}
 

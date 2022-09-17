@@ -23,6 +23,7 @@ public class UE {
     @Column(name = "libelle")
     private String libelle;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "ue")
     private List<Question> uequestions;
     
@@ -46,18 +47,20 @@ public class UE {
 		this.libelle = libelle;
 	}
 
+	@JsonIgnore
 	public List<Question> getUequestions() {
 		return uequestions;
 	}
 
+	@JsonIgnore
 	public void setUequestions(List<Question> uequestions) {
 		this.uequestions = uequestions;
 	}
-
+	@JsonIgnore
 	public List<Cours> getCours() {
 		return cours;
 	}
-
+	@JsonIgnore
 	public void setCours(List<Cours> cours) {
 		this.cours = cours;
 	}

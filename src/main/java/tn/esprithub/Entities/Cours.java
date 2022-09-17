@@ -58,10 +58,12 @@ public class Cours {
 		this.uecours = uecours;
 	}
 
+	@JsonIgnore
 	public List<LienUtile> getLiens() {
 		return liens;
 	}
 
+	@JsonIgnore
 	public void setLiens(List<LienUtile> liens) {
 		this.liens = liens;
 	}

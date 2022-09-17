@@ -2,6 +2,7 @@ package tn.esprithub.Controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,6 +10,9 @@ import java.util.List;
 
 import javax.sql.rowset.serial.SerialException;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -49,14 +53,14 @@ public class QuestionController {
 	
 	@PostMapping("/addQuestion")
 	@ResponseBody
-	public Question addQuestion(@RequestBody Question question,@RequestParam("ress") Long ress,@RequestParam("idu") long idu) {
-		return questionservice.addQuestion(question,ress,idu);
+	public Question addQuestion(@RequestBody Question question,@RequestParam("ress") Long ress,@RequestParam("idu") long idu,@RequestParam("idm") long idm) {
+		return questionservice.addQuestion(question,ress,idu,idm);
 	}
 	
 	@PostMapping("/addQuestionWRessource")
 	@ResponseBody
-	public Question addQuestionWithoutRessource(@RequestBody Question question,@RequestParam("idu") long idu) {
-		return questionservice.addQuestionWithoutRessource(question,idu);
+	public Question addQuestionWithoutRessource(@RequestBody Question question,@RequestParam("idu") long idu,@RequestParam("idm") long idm) {
+		 return questionservice.addQuestionWithoutRessource(question,idu,idm);
 	}
 	
 	
@@ -122,6 +126,77 @@ public class QuestionController {
 	public String downloadFile(@RequestParam("name") String name) throws SerialException, SQLException {
 		return questionservice.downloadFile(name);
 	}
+	
+	@GetMapping("/downloadImage")
+	@ResponseBody
+	public String downloadImage(@RequestParam("name") String name) throws IOException  {
+		return questionservice.downloadImage(name);
+	}
+	
+	 @PostMapping("/upload")
+	 @ResponseBody
+	 public String uploadImage(@RequestParam(value = "imageFile", required = true) MultipartFile  uploadFile) {
+		   FTPClient ftpClient = new FTPClient();
+		   String name="";
+		     try {
+		    	
+		    	 
+		         ftpClient.connect("192.168.1.19", 21);
+		         ftpClient.login("ftpuser", "ftpuser");
+		         ftpClient.enterLocalPassiveMode();
+
+		         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+		         // APPROACH #1: uploads first file using an InputStream
+		         File firstLocalFile = new File("D:/Test/Projects.zip");
+
+		     
+		         InputStream inputStream = uploadFile.getInputStream();
+		         String extension = FilenameUtils.getExtension(uploadFile.getOriginalFilename());
+		         System.out.println("Start uploading first file");
+		         
+		         boolean done = ftpClient.storeFile(uploadFile.getOriginalFilename(), inputStream);
+		         inputStream.close();
+		         if (done) {
+		             System.out.println("The first file is uploaded successfully.");
+		         }
+
+		         /*
+		         // APPROACH #2: uploads second file using an OutputStream
+		         File secondLocalFile = new File("E:/Test/Report.doc");
+		         String secondRemoteFile = "test/Report.doc";
+		         inputStream = new FileInputStream(secondLocalFile);
+		         System.out.println("Start uploading second file");
+		         OutputStream outputStream = ftpClient.storeFileStream(secondRemoteFile);
+		         byte[] bytesIn = new byte[4096];
+		         int read = 0;
+		         while ((read = inputStream.read(bytesIn)) != -1) {
+		             outputStream.write(bytesIn, 0, read);
+		         }
+		         inputStream.close();
+		         outputStream.close();
+		         boolean completed = ftpClient.completePendingCommand();
+		         if (completed) {
+		             System.out.println("The second file is uploaded successfully.");
+		         }*/
+		         
+
+		     } catch (IOException ex) {
+		         System.out.println("Error: " + ex.getMessage());
+		         ex.printStackTrace();
+		     } finally {
+		         try {
+		             if (ftpClient.isConnected()) {
+		                 ftpClient.logout();
+		                 ftpClient.disconnect();
+		             }
+		         } catch (IOException ex) {
+		             ex.printStackTrace();
+		         }
+		     }
+		     return uploadFile.getOriginalFilename();
+
+		}
 	
 	@PostMapping("/addRessource")
 	@ResponseBody
