@@ -30,20 +30,24 @@ public class RegistrationService {
       if(!isValidEmail) {
           throw new IllegalStateException("email not valid");
       }
-        String token=  userServiceRegistration.signUpUser(
-                new User(
-                        request.getFirstName(),
-                        request.getLastName(),
-                        request.getEmail(),
-                        request.getPassword(),
-                        request.getGender(),
-                        request.getAddress(),
-                        request.getPhone(),
-                        Role.user
-                )
+      User user=  new User(
+              request.getFirstName(),
+              request.getLastName(),
+              request.getEmail(),
+              request.getPassword(),
+              request.getGender(),
+              request.getAddress(),
+              request.getPhone(),
+              Role.user,
+              LocalDateTime.now()
+      );
+      user.setImage("avatar.jpg");
+        String token=  userServiceRegistration.signUpUser(user
+              
         );
-      String link= "http://localhost:8082/registration/confirm?token="+token;
+      String link= "http://localhost:8082/EspritHub/registration/confirm?token="+token;
      emailSender.send(request.getEmail( ),buildEmail(request.getFirstName() , link));
+     System.out.println(token);
       return  token;
     }
     @Transactional
@@ -138,4 +142,6 @@ public class RegistrationService {
                 "\n" +
                 "</div></div>";
     }
+    
+    
 }

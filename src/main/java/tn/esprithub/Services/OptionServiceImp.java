@@ -43,4 +43,9 @@ public class OptionServiceImp implements OptionService{
     public Options save(Options o) {
         return optionsRepository.save(o);
     }
+
+    @Override
+    public Long countOptions() {
+        return optionsRepository.count();
+    }
 }

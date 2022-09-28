@@ -28,5 +28,13 @@ public class UEService implements IUEService{
 			course.setUecours(ue);
 			courseRepo.save(course);
 		}
+		@Override
+		@Transactional
+		public void addCourseAndAssignUE(Cours cours, Long idUE)
+ {
+			UE ue= ueRepo.findById(idUE).orElse(null);
+			cours.setUecours(ue);
+			courseRepo.save(cours);
+		}
 		
 }

@@ -1,6 +1,8 @@
 package tn.esprithub.Entities;
 
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,6 +21,7 @@ public class RegistrationRequest {
     private  final Long phone ;
     private  final  String address;
     private  final  String role;
+    private  final Date createdAt;
 
 
 }

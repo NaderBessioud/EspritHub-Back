@@ -20,13 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import tn.esprithub.Entities.Cours;
 import tn.esprithub.Entities.UE;
 import tn.esprithub.Exception.RessourceNotFoundException;
 import tn.esprithub.Repository.UeRepository;
 import tn.esprithub.Services.UEService;
 
 
-@CrossOrigin(origins="http://localhost:4200")
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("Ue")
 public class UeController {
@@ -77,6 +78,15 @@ public class UeController {
 	   
 	   @Autowired
 	   UEService ueService;
+	   @PostMapping("/affecterCourseUE/{idUe}")
+	   @ResponseBody
+	   public String affecterCourseUE(@PathVariable("idUe")Long idUe,@RequestBody Cours cours ) {
+		   ueService.addCourseAndAssignUE(cours, idUe);
+		   return "Done";
+		   
+	   }
+	   
+	
 	   @PutMapping("/affecterCourseUE/{idCourse}/{idUe}")
 	   @ResponseBody
 	   public String affecterCourseUE(@PathVariable("idUe")Long idUe,@PathVariable("idCourse")Long idCourse ) {
@@ -84,8 +94,6 @@ public class UeController {
 		   return "Done";
 		   
 	   }
-	   
-
 
 	   
 }

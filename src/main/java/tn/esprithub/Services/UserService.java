@@ -1,6 +1,10 @@
 package tn.esprithub.Services;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -25,6 +29,9 @@ public class UserService {
 	    
 	@Autowired
 	private UserRepository repository;
+	
+	private final LocalDateTime now= LocalDateTime.now();
+	  private final LocalDateTime yesterday= LocalDateTime.now().minusDays(1);
 	public User findByUserName(String username) {
 		return repository.findByUsername(username);
 	}
@@ -49,7 +56,8 @@ public class UserService {
 	
 	 
 	    public User update(User user, Long id) {
-	        if (repository.findById(id).isPresent()) {
+	    	System.out.print(repository.findById(id).get().getFirstName());
+	        if (repository.findById(id).get() != null) {
 	            User u = repository.findById(id).get();
 	            u.setFirstName(user.getFirstName());
 	            u.setLastName(user.getLastName());
@@ -58,6 +66,7 @@ public class UserService {
 	            u.setNiveau(user.getNiveau());
 	            u.setAddress(user.getAddress());
 	            Options option = optionService.findById(user.getOption().getIdOption());
+	            System.out.print(option);
 	            u.setOption(option);
 	            u.setAboutMe(user.getAboutMe());
 	            return repository.save(u);
@@ -75,6 +84,8 @@ public class UserService {
 
 	    
 	    public List<User> findAll() {
+	    	List<User> list=(List<User>) repository.findAll();
+	    	System.out.print("===================================="+list.get(0).getFirstName()+"====================================");
 	        return (List<User>) repository.findAll();
 	    }
 
@@ -119,5 +130,105 @@ public class UserService {
 
 	        }
 	        return "false";    }
+	    
+	    
+	    public Map<String, String> changePassword(String newPassword, String oldpassword, Long id) {
+	        HashMap<String, String> map = new HashMap<>();
+
+	        if (repository.findById(id).isPresent()) {
+	            User u = repository.findById(id).get();
+	            if (bCryptPasswordEncoder.matches(oldpassword, u.getPassword())) {
+	                u.setPassword(bCryptPasswordEncoder.encode(newPassword));
+	                repository.save(u);
+	                map.put("response", "password changed Successfully");
+
+	            }else {
+	                map.put("response", "wrong password");
+	            }
+
+
+	    }
+	        return map;
+	    }
+	    public Long countUsers(){
+	        return repository.count();
+	    }
+
+	    
+	    public Long usersByday() {
+	       return repository.findAllActiveUsersNative(yesterday,now).stream().count();
+	    }
+
+	    
+	    public Long listuserByrRoleUser() {
+	        return repository.findUserRole("user").stream().count();
+	    }
+
+	    
+	    public Long listuserByrRoleTeacher() {
+	        return repository.findUserRole("teacher").stream().count();
+	    }
+
+	    
+	    public List getUserPerMonth() {
+	        List<User> users = (List<User>) repository.findAll();
+	        int jan = 0 ;
+	        int feb = 0 ;
+	        int mar = 0 ;
+	        int apr = 0 ;
+	        int may = 0 ;
+	        int jun = 0 ;
+	        int july = 0 ;
+	        int aug = 0 ;
+	        int sep = 0 ;
+	        int oct = 0 ;
+	        int nov = 0 ;
+	        int dec = 0 ;
+
+	        for (User user : users) {
+	            if( user.getCreatedat().getMonth().name()=="JANUARY"){
+	                jan=jan+1;
+	            }
+	            if( user.getCreatedat().getMonth().name()=="FEBRUARY"){
+	                feb=feb+1;
+	            } if( user.getCreatedat().getMonth().name()=="MARCH"){
+	                mar=mar+1;
+	            } if( user.getCreatedat().getMonth().name()=="APRIL"){
+	                apr=apr+1;
+	            } if( user.getCreatedat().getMonth().name()=="MAY"){
+	                may=may+1;
+	            } if( user.getCreatedat().getMonth().name()=="JUNE"){
+	                jun=jun+1;
+	            } if( user.getCreatedat().getMonth().name()=="JULY"){
+	                july=july+1;
+	            } if( user.getCreatedat().getMonth().name()=="AUGUST"){
+	                aug=aug+1;
+	            }
+	            if( user.getCreatedat().getMonth().name()=="SEPTEMBER"){
+	                sep=sep+1;
+	            } if( user.getCreatedat().getMonth().name()=="OCTOBER"){
+	                oct=oct+1;
+	            } if( user.getCreatedat().getMonth().name()=="NOVEMBER"){
+	                nov=nov+1;
+	            } if( user.getCreatedat().getMonth().name()=="DECEMBER"){
+	                dec=dec+1;
+	            }
+	        }
+	        List usersPermonth = new ArrayList();
+	        usersPermonth.add(jan);
+	        usersPermonth.add(feb);
+	        usersPermonth.add(mar);
+	        usersPermonth.add(apr);
+	        usersPermonth.add(may);
+	        usersPermonth.add(jun);
+	        usersPermonth.add(july);
+	        usersPermonth.add(aug);
+	        usersPermonth.add(sep);
+	        usersPermonth.add(oct);
+	        usersPermonth.add(nov);
+	        usersPermonth.add(dec);
+	        return usersPermonth;
+	    }
+
 
 }

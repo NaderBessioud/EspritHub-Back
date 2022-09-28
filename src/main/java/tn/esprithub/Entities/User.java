@@ -2,6 +2,7 @@ package tn.esprithub.Entities;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+
 
 
 
@@ -60,7 +63,8 @@ public class User implements UserDetails {
     private Boolean locked = false;
     @Column(name = "enabled")
     private Boolean enabled = false;
-    
+    @Column(name="createdAt")
+    private LocalDateTime createdat;
     @Transient
     private String token;
     
@@ -68,7 +72,7 @@ public class User implements UserDetails {
     private Set<Chat> chatsender;
     @OneToMany(mappedBy = "receiver")
     private Set<Chat> chatreceiver;
-    @JsonIgnore
+    
     @ManyToOne
     private Options option;
     
@@ -138,6 +142,19 @@ public class User implements UserDetails {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	 public User(String firstName, String lastName, String email, String password, Gender gender, String address, Long phone, Role role,LocalDateTime createdAt ) {
+	        this.firstName = firstName;
+	        this.lastName = lastName;
+	        this.email = email;
+	        this.password = password;
+	        this.gender = gender;
+	        this.address = address;
+	        this.phone = phone;
+	        this.role = role;
+	        this.createdat=createdAt;
+
+	    }
     
 
 
