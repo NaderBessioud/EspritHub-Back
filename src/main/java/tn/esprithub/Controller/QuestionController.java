@@ -217,6 +217,12 @@ public class QuestionController {
 		return questionservice.getStudentsQuestion();
 	}
 	
+	@GetMapping("/countQuestions")
+	@ResponseBody
+	public Long countQuestions(){
+		return questionservice.countQuestions();
+	}
+	
 
 	
 	
