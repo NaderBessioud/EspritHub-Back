@@ -550,6 +550,11 @@ public class QuestionServiceImp implements QuestionService {
        }
 	 }
 	 
+	 @Override
+		public Long countQuestions() {
+			return questionRepository.count();
+		}
+	 
 	
 
 }

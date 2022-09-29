@@ -19,4 +19,5 @@ public interface QuestionService {
 	Question updateProduit(Question u);
 
 	Question retrieveQuestion(Long id);
+	Long countQuestions();
 }
