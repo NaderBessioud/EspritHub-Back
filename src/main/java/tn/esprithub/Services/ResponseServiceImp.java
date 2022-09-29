@@ -86,9 +86,9 @@ public class ResponseServiceImp implements IResponseService {
 			String nom=user.getFirstName()+" "+user.getLastName();
 			if(response.getApproved()==1 || response.getApproved()==2) {
 			result.add(new UserQuestion(response.getIdResponse(),nom, response.getContent(), response.getDatepub(),"", 0, user.getRole().toString(),AffectBadge(response.getIdUser()),this.downloadImage(user.getImage())));
-			System.out.print("============================>"+response.getApproved());
+			
 			}
-			System.out.print("============================>"+response.getApproved());
+			;
 		}
 		
 		

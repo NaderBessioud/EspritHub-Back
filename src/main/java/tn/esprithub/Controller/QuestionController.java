@@ -111,6 +111,7 @@ public class QuestionController {
 	
 	@PutMapping("/CloseQuestion")
 	public void closeQuestion(@RequestBody Question question) {
+		System.out.print(question.getIdQuestion()+"  ================================");
 		questionservice.closeQuestion(question.getIdQuestion());
 	}
 	

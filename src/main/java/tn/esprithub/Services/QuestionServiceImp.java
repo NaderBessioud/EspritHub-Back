@@ -254,7 +254,10 @@ public class QuestionServiceImp implements QuestionService {
 	
 	public void closeQuestion(Long id) {
 		Question question=questionRepository.findById(id).get();
+		System.out.print(question.getContent()+"  ================================");
 		question.setClosed(true);
+		questionRepository.save(question);
+		
 	}
 	
 	

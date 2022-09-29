@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Entity
-@Data
+
 public class Options {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +49,65 @@ public class Options {
 			super();
 			// TODO Auto-generated constructor stub
 		}
+
+
+
+
+		public Long getIdOption() {
+			return idOption;
+		}
+
+
+
+
+		public void setIdOption(Long idOption) {
+			this.idOption = idOption;
+		}
+
+
+
+
+		public String getLibelle() {
+			return libelle;
+		}
+
+
+
+
+		public void setLibelle(String libelle) {
+			this.libelle = libelle;
+		}
+
+
+
+		@JsonIgnore
+		public Set<User> getUseroption() {
+			return useroption;
+		}
+
+
+
+		@JsonIgnore
+		public void setUseroption(Set<User> useroption) {
+			this.useroption = useroption;
+		}
+
+
+
+
+		public String getDiscription() {
+			return discription;
+		}
+
+
+
+
+		public void setDiscription(String discription) {
+			this.discription = discription;
+		}
+		
+		
+		
 		
 		
 }
