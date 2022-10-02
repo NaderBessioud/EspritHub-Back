@@ -43,6 +43,10 @@ public class UserService {
 		
 		return repository.save(user);
 	}
+	
+	public User updataUser(User user) {
+		return repository.save(user);
+	}
 	public boolean verrifymail(String email) {
 		User user=repository.findByEmail(email);
 		return user != null;

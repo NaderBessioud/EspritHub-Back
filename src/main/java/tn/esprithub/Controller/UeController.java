@@ -39,6 +39,12 @@ public class UeController {
 	    public List <UE> getAllUE(){
 	        return ueRepository.findAll();
 	    }
+	 @GetMapping("/Ues1")
+	    public List <UE> getAllUE1(){
+		 List<UE> list= ueRepository.findAll();
+		 list.add(0,new UE("Choose UE"));
+		 return list;
+	    }
 	 @PostMapping("/Ue")
 	    public UE createCours( @Validated @RequestBody UE ue) {
 	    	return ueRepository.save(ue);

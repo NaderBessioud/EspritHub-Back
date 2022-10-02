@@ -69,7 +69,8 @@ public class UserController {
         
         
     	user.setImage(file);
-        userService.addUser(user);
+    	
+        userService.updataUser(user);
         
         return "The File Uploaded Successfully";
     }

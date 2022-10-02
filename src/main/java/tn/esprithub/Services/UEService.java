@@ -1,5 +1,7 @@
 package tn.esprithub.Services;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import tn.esprithub.Entities.Cours;
 import tn.esprithub.Entities.UE;
+import tn.esprithub.Entities.UserQuestion;
 import tn.esprithub.Repository.CoursRepository;
 import tn.esprithub.Repository.UeRepository;
 
@@ -36,5 +39,8 @@ public class UEService implements IUEService{
 			cours.setUecours(ue);
 			courseRepo.save(cours);
 		}
+		
+		
+		
 		
 }

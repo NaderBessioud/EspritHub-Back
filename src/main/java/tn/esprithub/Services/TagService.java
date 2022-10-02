@@ -137,16 +137,16 @@ try {
 			Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
 			if(ressource != null) {
 				if(ressource.getType()==TypeRessource.Image)
-					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), null, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
 
 			
 			else {
-				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), null, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
 
 			}
 			}
 			else {
-				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), null, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),""));
+				result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),imp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), questionRepository.downloadImage(q.getUserquestions().getImage()),""));
 
 			}
 

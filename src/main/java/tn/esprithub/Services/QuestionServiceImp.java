@@ -74,6 +74,8 @@ public class QuestionServiceImp implements QuestionService {
 	@Autowired
 	private UeRepository ueRepository;
 	
+	
+	
 	@Transactional
 	public Question addQuestionWithoutRessource(Question q,long idu,long idm) {
 		User user=userRepository.findById(idu).get();
@@ -555,6 +557,104 @@ public class QuestionServiceImp implements QuestionService {
 			return questionRepository.count();
 		}
 	 
+	 public List<UserQuestion> getQuestionByUE(String libelle) throws SerialException, IOException, SQLException{
+		 List<UE> ues=ueRepository.findByLibelle(libelle);
+		 System.out.print("===============>"+ues.size()+"<============================================");
+		 List<Question> questions=new ArrayList<>();
+		 List<UserQuestion> userQuestions=new ArrayList<>();
+		 for (UE ue : ues) {
+			questions.addAll(ue.getUequestions());
+		}
+		 try {
+		 for (Question q : questions) {
+			 List<String> tags=new ArrayList<>();
+			 for (Tag t : q.getTags()) {
+				tags.add(t.getTitle());
+			}
+			 String nom=q.getUserquestions().getFirstName()+" "+q.getUserquestions().getLastName();
+			 Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
+				if(ressource != null) {
+					if(ressource.getType()==TypeRessource.Image)
+						userQuestions.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
+
+				
+				else {
+					userQuestions.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
+
+				}
+				}
+				else {
+					userQuestions.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),""));
+
+				}
+			
+		}
+		 
+	 }
+
+	 catch(NullPointerException ex) {
+	 	
+	 }
+	 		
+	 		
+	 	
+	 	
+		return userQuestions;
+			
+		}
+	 
+	 
+		public List<UserQuestion> getQuestionByTag(String title) throws IOException, SerialException, SQLException{
+			Tag tag=repository.findByTitle(title);
+			List<UserQuestion> result=new ArrayList<>();
+	try {
+			for (Question q : tag.getQuestiontag()) {
+				List<String> tags=new ArrayList<>();
+				for (Tag tagg : q.getTags()) {
+					tags.add(tagg.getTitle());
+				}
+				
+				String nom=q.getUserquestions().getFirstName()+" "+q.getUserquestions().getLastName();
+				
+				Ressource ressource=q.getQuestionressources().stream().findFirst().orElse(null);
+				if(ressource != null) {
+					if(ressource.getType()==TypeRessource.Image)
+						result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),this.downloadImage(ressource.getLibelle())));
+
+				
+				else {
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),this.downloadFile(ressource.getLibelle())));
+
+				}
+				}
+				else {
+					result.add(new UserQuestion(q.getIdQuestion(), nom, q.getContent(), q.getDatepub(), q.getTitle(), q.getNbresp(), tags, q.getUserquestions().getRole().toString(),responseServiceImp.getQuestionAnswersNotApproved(q.getIdQuestion()).size(),responseServiceImp.AffectBadge(q.getUserquestions().getId()), this.downloadImage(q.getUserquestions().getImage()),""));
+
+				}
+
+			}
+			}
+	catch(NullPointerException ex) {
+		
+	}
+			return result;
+			
+		}
+		
+		
+		public List<UserQuestion> getQuestionByTagAndUE(String tag,String libelle) throws SerialException, IOException, SQLException{
+			List<UserQuestion> tagq=new ArrayList<>();
+			List<UserQuestion> ueq=new ArrayList<>();
+			List<UserQuestion> result=new ArrayList<>();
+			tagq=this.getQuestionByTag(tag);
+			ueq=this.getQuestionByUE(libelle);
+			result.addAll(tagq);
+			for (UserQuestion userQuestion : ueq) {
+				if( tagq.contains(userQuestion))
+					result.add(userQuestion);
+			}
+			return result;
+		}
 	
 
 }

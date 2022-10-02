@@ -223,6 +223,24 @@ public class QuestionController {
 		return questionservice.countQuestions();
 	}
 	
+	@GetMapping("/QuestionByTag")
+	@ResponseBody
+	public List<UserQuestion> getQuestionByTag(@RequestParam("tag") String tag) throws SerialException, IOException, SQLException{
+		return questionservice.getQuestionByTag(tag);
+	}
+	
+	@GetMapping("/QuestionByUE")
+	@ResponseBody
+	public List<UserQuestion> getQuestionByUE(@RequestParam("libelle") String libelle) throws SerialException, IOException, SQLException{
+		return questionservice.getQuestionByUE(libelle);
+	}
+	
+	
+	@GetMapping("/QuestionByTagAndUE")
+	@ResponseBody
+	public List<UserQuestion> getQuestionByTagAndUe(@RequestParam("tag") String tag,@RequestParam("libelle") String libelle) throws SerialException, IOException, SQLException{
+		return questionservice.getQuestionByTagAndUE(tag, libelle);
+	}
 
 	
 	

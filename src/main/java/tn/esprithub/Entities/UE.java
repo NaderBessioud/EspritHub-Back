@@ -65,5 +65,16 @@ public class UE {
 		this.cours = cours;
 	}
 
+	
+	public UE(String title) {
+		this.libelle=title;
+	}
+
+	public UE() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 
 }
